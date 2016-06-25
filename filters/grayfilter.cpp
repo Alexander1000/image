@@ -1,18 +1,15 @@
-class GrayFilter
+#include "filter.cpp"
+
+class GrayFilter : public Filter
 {
     public:
-        int width;
-        int height;
-
-        GrayFilter() {
+        GrayFilter() : Filter() {
             // do something ...
         }
 
-        GrayFilter(int* bitMap, int width, int height) {
-            this->originalBitMap = bitMap;
-            this->width = width;
-            this->height = height;
-        }
+        GrayFilter(int* bitMap, int width, int height) : Filter(bitMap, width, height) {
+            // do something ...
+         }
 
         int* filter() {
             this->bitMap = (int*) malloc(width * height * sizeof(int));
@@ -33,8 +30,4 @@ class GrayFilter
 
             return this->bitMap;
         }
-    protected:
-    private:
-        int* bitMap;
-        int* originalBitMap;
 };

@@ -2,7 +2,7 @@
 #include <jpeglib.h>
 #include "image.cpp"
 #include "pixel.cpp"
-#include "grayfilter.cpp"
+#include "filters/grayfilter.cpp"
 
 using namespace std;
 
