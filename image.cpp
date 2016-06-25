@@ -1,3 +1,6 @@
+#include "pixel.cpp"
+#include "filters/filter.cpp"
+
 // class for save & load image
 class Image
 {

@@ -1,5 +1,3 @@
-#include "filter.cpp"
-
 class GrayFilter : public Filter
 {
     public:
