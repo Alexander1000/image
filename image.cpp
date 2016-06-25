@@ -102,10 +102,14 @@ class Image
         }
 
         int saveJpeg(char* fileName) {
-            return this->saveJpegImage(fileName, this->bitMap, this->width, this->height);
+            return this->saveJpegBitmap(fileName, this->bitMap, this->width, this->height);
         }
 
-        int saveJpegImage(char* fileName, int* bitMap, int width, int height) {
+        int saveJpegBitmap(const char* fileName, int* bitMap, int width, int height) {
+            return saveJpegBitmap((char*) fileName, bitMap, width, height);
+        } 
+
+        int saveJpegBitmap(char* fileName, int* bitMap, int width, int height) {
             struct jpeg_compress_struct cinfo;
             struct jpeg_error_mgr jerr;
 
