@@ -9,7 +9,39 @@ class ZoneFilter : public Filter
 
         ZoneFilter(int* bitMap, int width, int height) : Filter(bitMap, width, height) {
             // do something ...
-         }
+        }
+
+        int* filterSmooth() {
+            this->buffer = (int*) malloc(width * height * sizeof(int));
+            memcpy(this->buffer, this->originalBitMap, width * height * sizeof(int));
+
+            this->bitMap = (int*) malloc(width * height * sizeof(int));
+
+            // плавно сглаживаем цвета
+            this->smoothBitMap(16);
+            this->smoothBitMap(32);
+            this->smoothBitMap(64);
+
+            this->cutPopularColor(3);
+
+            this->smoothBitMap(64);
+
+            //this->diffuseImage(64, 2);
+
+            // строим сигнатуру изображения
+            // this->buildSignature();
+
+            Pixel pixel;
+
+            for (int i = 0; i < height; ++i) {
+                for (int j = 0; j < width; ++j) {
+                    pixel.load(this->buffer[i * width + j]);
+                    this->bitMap[i * width + j] = pixel.toInt32();
+                }
+            }
+
+            return this->bitMap;
+        } 
 
         int* filter() {
             this->buffer = (int*) malloc(width * height * sizeof(int));
@@ -23,19 +55,19 @@ class ZoneFilter : public Filter
             this->smoothBitMap(64);
 
             // todo: дополнительно сгладить цвет?
-            // this->diffuseImage(64, 1);
+            // this->diffuseImage(64, 3);
 
             // строим сигнатуру изображения
             this->buildSignature();
 
             // подавляем немного шума
-            this->noiseClear(1, 48);
-            this->noiseClear(2, 48);
-            this->noiseClear(3, 32);
-            this->noiseClear(4, 32);
-            this->noiseClear(5, 16);
-            this->noiseClear(6, 8);
-            this->noiseClear(7, 8);
+            this->noiseClear(1, 64);
+            this->noiseClear(2, 64);
+            this->noiseClear(3, 48);
+            this->noiseClear(4, 48);
+            this->noiseClear(5, 32);
+            this->noiseClear(6, 32);
+            this->noiseClear(7, 16);
             this->noiseClear(8, 8);
 
             Pixel pixel;
@@ -53,12 +85,101 @@ class ZoneFilter : public Filter
         int* buffer;
         int* preBitMap;
 
+        void cutPopularColor(int count) {
+            this->preBitMap = (int*) malloc(width * height * sizeof(int));
+
+            int red[256][2], green[256][2], blue[256][2];
+            Pixel pixel;
+
+            for (int i = 0; i < 256; ++i) {
+                red[i][0] = 0;
+                red[i][1] = i;
+                green[i][0] = 0;
+                green[i][1] = i;
+                blue[i][0] = 0;
+                blue[i][1] = i;
+            }
+
+            for (int i = 0; i < this->height; ++i) {
+                for (int j = 0; j < this->width; ++j) {
+                    pixel.load(this->buffer[i * this->width + j]);
+                    ++red[pixel.red][0];
+                    ++green[pixel.green][0];
+                    ++blue[pixel.blue][0];
+                }
+            }
+
+            int temp[2];
+
+            for (int i = 0; i < 256; ++i) {
+                for (int j = 0; j < 255; ++j) {
+                    if (red[j][0] < red[j + 1][0]) {
+                        temp[0] = red[j][0];
+                        temp[1] = red[j][1];
+                        red[j][0] = red[j + 1][0];
+                        red[j][1] = red[j + 1][1];
+                        red[j + 1][0] = temp[0];
+                        red[j + 1][1] = temp[1];
+                    }
+
+                    if (green[j][0] < green[j + 1][0]) {
+                        temp[0] = green[j][0];
+                        temp[1] = green[j][1];
+                        green[j][0] = green[j + 1][0];
+                        green[j][1] = green[j + 1][1];
+                        green[j + 1][0] = temp[0];
+                        green[j + 1][1] = temp[1];
+                    }
+
+                    if (blue[j][0] < blue[j + 1][0]) {
+                        temp[0] = blue[j][0];
+                        temp[1] = blue[j][1];
+                        blue[j][0] = blue[j + 1][0];
+                        blue[j][1] = blue[j + 1][1];
+                        blue[j + 1][0] = temp[0];
+                        blue[j + 1][1] = temp[1];
+                    }
+                }
+            }
+
+            Pixel newPixel(red[count][1], green[count][1], blue[count][1]);
+
+            for (int i = 0; i < this->height; ++i) {
+                for (int j = 0; j < this->width; ++j) {
+                    pixel.load(this->buffer[i * this->width + j]);
+                    bool redExist = false, greenExist = false, blueExist = false;
+
+                    for (int k = 0; k < count / 3; ++k) {
+                        if (red[k][1] == pixel.red) {
+                            redExist = true;
+                        }
+
+                        if (green[k][1] == pixel.green) {
+                            greenExist = true;
+                        }
+
+                        if (blue[k][1] == pixel.blue) {
+                            blueExist = true;
+                        }
+                    }
+
+                    if (redExist && greenExist && blueExist) {
+                        this->preBitMap[i * this->width + j] = newPixel.toInt32();
+                    } else {
+                        this->preBitMap[i * this->width + j] = pixel.toInt32();
+                    }
+                }
+            }
+
+            memcpy(this->buffer, this->preBitMap, width * height * sizeof(int));
+            free(this->preBitMap);
+        }
 
         void smoothBitMap(int divider) {
             this->preBitMap = (int*) malloc(width * height * sizeof(int));
             Pixel pixel;
             Pixel newPixel;
-            int half = divider / 2;
+            int half = divider >> 1;
             int mod;
 
             for (int i = 0; i < this->height; ++i) {
@@ -466,7 +587,7 @@ class ZoneFilter : public Filter
                         kSumDots += this->getKGray(pixel.red, 8);
                     }
 
-                    if (kSumDots < k) {
+                    if (kSumDots <= k) {
                         pixel.load((UCHAR) 0xFF);
                         this->preBitMap[i * this->width + j] = pixel.toInt32();
                     } else {
