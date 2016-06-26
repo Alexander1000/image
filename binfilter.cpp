@@ -1,5 +1,7 @@
 #include <iostream>
 #include <jpeglib.h>
+#include <vector>
+#include <math.h>
 #include "image.cpp"
 //#include "pixel.cpp"
 #include "filters/grayfilter.cpp"
