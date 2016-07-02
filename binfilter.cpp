@@ -4,8 +4,9 @@
 #include <math.h>
 #include "image.cpp"
 //#include "pixel.cpp"
-#include "filters/grayfilter.cpp"
+//#include "filters/grayfilter.cpp"
 #include "filters/zonefilter.cpp"
+#include "filters/binfilter.cpp"
 
 using namespace std;
 
@@ -30,10 +31,18 @@ int main(int argc, char* argv[])
     }
 
     ZoneFilter zonefilter(image.bitMap, image.width, image.height);
+    int* bitMap = zonefilter.filter();
 
-    if (image.saveJpegBitmap("derevo3.jpg", zonefilter.filter(), image.width, image.height) == 0) {
+    if (image.saveJpegBitmap("derevo3.jpg", bitMap, image.width, image.height) == 0) {
         cout << "Zone filter save ..." << endl;
     }
+
+    BinFilter binFilter(bitMap, image.width, image.height);
+    // FILE file;
+    binFilter.filter();
+    binFilter.save("derevo.bin");
+    // file = fopen("out.bin", "wb");
+    // fclose(file);
 
     return 0;
 }

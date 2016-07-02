@@ -604,8 +604,4 @@ class ZoneFilter : public Filter
             // return maxK - ((color + 1) * maxK / 0x100);
             return (int) round(maxK * (1 - (float) (color + 1) / 0x100));
         }
-
-        void analyseBitMap() {
-            // do ...
-        }
 };
