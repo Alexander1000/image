@@ -10,3 +10,6 @@ buildcostmap derevo.bin derevo.k
 
 # gauge for bin-file by k-koefficients
 gauge derevo.bin derevo.k
+
+# pixelator
+pixelator source.jpg dist.jpg 15 15

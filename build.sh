@@ -9,3 +9,6 @@ g++ -g -o buildcostmap buildcostmap.o -lm
 
 g++ -Wall -pedantic -c -o gauge.o gauge.cpp
 g++ -g -o gauge gauge.o -lm
+
+g++ -Wall -pedantic -I/Users/amdankovtsev/Downloads/jpeg-9b -c -o pixelator.o pixelator.cpp
+g++ -ljpeg -g -o pixelator pixelator.o -lm
