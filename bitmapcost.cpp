@@ -26,7 +26,7 @@ class BitMapCost
         float calc() {
             // float result = 0.0f;
             float sum = 0.0f;
-            int blackPixels = 0;
+            // int blackPixels = 0;
 
             for (int i = 0; i < this->height; ++i) {
                 for (int j = 0; j < this->width; ++j) {
@@ -34,25 +34,32 @@ class BitMapCost
                         continue;
                     }
 
-                    ++blackPixels;
+                    //++blackPixels;
                     int ic = (int) ((float) i * this->kHeight / this->height);
                     int jc = (int) ((float) j * this->kWidth / this->width);
 
-                    sum += this->costMap[ic * this->kWidth + jc];
+                    float cost = this->costMap[ic * this->kWidth + jc]; 
+                    sum += cost;
                 }
             }
 
             int kForm = this->kWidth * this->kHeight;
             int form = this->width * this->height;
-            float rate;
+            float rateForm, ratePixels;
 
             if (kForm > form) {
-                rate = (float) form / kForm;
+                rateForm = (float) form / kForm;
             } else {
-                rate = (float) kForm / form;
+                rateForm = (float) kForm / form;
             }
 
-            return (sum / blackPixels) * rate;
+            if (this->kBlackPixels > this->blackPixels) {
+                ratePixels = (float) this->blackPixels / this->kBlackPixels;
+            } else {
+                ratePixels = (float) this->kBlackPixels / this->blackPixels;
+            }
+            
+            return (sum / this->blackPixels) * rateForm * ratePixels;
         }
 
         void buildCost() {
@@ -71,7 +78,7 @@ class BitMapCost
             this->kHeight = (*size >> 16) & 0xFFFF;
             free(size);
 
-            fread(&this->blackPixels, sizeof(int), 1, file);
+            fread(&this->kBlackPixels, sizeof(int), 1, file);
 
             size_t result;
             // stream size for read by parts
@@ -93,13 +100,13 @@ class BitMapCost
 
                 result = fread(stream, sizeof(float), sizeStream, file);
 
-                if (result >= sizeStream) {
+                if (result > 0) {
                     memcpy(this->costMap + offset, stream, sizeStream * sizeof(float));
                     offset += result;
                 }
 
                 free(stream);
-            } while(result >= sizeStream);
+            } while(result > 0);
 
             fclose(file);
         }
@@ -141,7 +148,7 @@ class BitMapCost
 
                 result = fread(stream, sizeof(UCHAR), sizeStream, file);
 
-                if (result >= sizeStream) {
+                if (result > 0) {
                     for (int i = 0; i < sizeStream; ++i) {
                         byte = stream[i];
 
@@ -163,7 +170,7 @@ class BitMapCost
                 }
 
                 free(stream);
-            } while(result >= sizeStream);
+            } while(result > 0);
 
             fclose(file);
         }
@@ -219,11 +226,21 @@ class BitMapCost
         }
 
         void buildCostMap() {
+            // прогреваем
+            this->calcKoefficient(1);
+
             for (int i = 0; i < this->height; ++i) {
                 for (int j = 0; j < this->width; ++j) {
                     this->costMap[i * this->width + j] = this->calcKoefficient(this->bitMap[i * this->width + j]);
                 }
             }
+
+            /*
+            for (int i = 0; i < this->widthGradient; ++i) {
+                float cost = this->calcKoefficient(i);
+
+                cout << "Cost[" << i << "] = " << cost << endl;
+            }*/
         }
 
         void save(const char* fileName) {
@@ -267,6 +284,8 @@ class BitMapCost
         float* costMap;
         int widthGradient;
         int blackPixels;
+        int kBlackPixels;
+        float maxK;
 
         float calcKoefficient(UCHAR index) {
             if (index == 0) {
@@ -274,8 +293,14 @@ class BitMapCost
             }
 
             float diffE = exp(1) - 1.0;
-            float indexK = (float) (this->widthGradient - index) / this->widthGradient;
-            return log(1.0 + diffE * indexK);
+            float indexK = (float) (this->widthGradient - index + 1) / this->widthGradient;
+            float k = exp(diffE * indexK) * sin(indexK * diffE);
+
+            if (index == 1) {
+                this->maxK = k;
+            }
+
+            return k / this->maxK;
         }
 
         bool isNull(int i, int j) {
