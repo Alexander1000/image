@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     BitMapCost mapCost(argv[1]);
-    mapCost.buildCost();
-    mapCost.save(argv[2]);
+    mapCost.loadKFile(argv[2]);
+    cout << "Gauge: " << mapCost.calc() << endl;
     return 0;
 }

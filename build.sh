@@ -6,3 +6,6 @@ g++ -ljpeg -g -o bin2jpg bin2jpg.o -lm
 
 g++ -Wall -pedantic -c -o buildcostmap.o buildcostmap.cpp
 g++ -g -o buildcostmap buildcostmap.o -lm
+
+g++ -Wall -pedantic -c -o gauge.o gauge.cpp
+g++ -g -o gauge gauge.o -lm

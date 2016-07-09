@@ -8,21 +8,103 @@ class BitMapCost
         int width;
         int height;
 
+        int kWidth;
+        int kHeight;
+
         BitMapCost() {
             // do something...
         }
 
         BitMapCost(const char* fileName) {
-            this->loadFile((char*) fileName);
+            this->loadBinFile((char*) fileName);
         }
 
         BitMapCost(char* fileName) {
-            this->loadFile(fileName);
+            this->loadBinFile(fileName);
+        }
+
+        float calc() {
+            // float result = 0.0f;
+            float sum = 0.0f;
+            int blackPixels = 0;
+
+            for (int i = 0; i < this->height; ++i) {
+                for (int j = 0; j < this->width; ++j) {
+                    if (this->bitMap[i * this->width + j] == 0) {
+                        continue;
+                    }
+
+                    ++blackPixels;
+                    int ic = (int) ((float) i * this->kHeight / this->height);
+                    int jc = (int) ((float) j * this->kWidth / this->width);
+
+                    sum += this->costMap[ic * this->kWidth + jc];
+                }
+            }
+
+            int kForm = this->kWidth * this->kHeight;
+            int form = this->width * this->height;
+            float rate;
+
+            if (kForm > form) {
+                rate = (float) form / kForm;
+            } else {
+                rate = (float) kForm / form;
+            }
+
+            return (sum / blackPixels) * rate;
+        }
+
+        void buildCost() {
+            this->costMap = (float*) malloc(this->width * this->height * sizeof(float));
             this->prepareBuildCost(40);
             this->buildCostMap();
         }
 
-        void loadFile(char* fileName) {
+        void loadKFile(char* fileName) {
+            FILE* file = fopen(fileName, "rb");
+
+            // first 4 bytes - size (width x height); 4 byte blackPixels
+            int* size = (int*) malloc(sizeof(int));
+            fread(size, sizeof(int), 1, file);
+            this->kWidth = *size & 0xFFFF;
+            this->kHeight = (*size >> 16) & 0xFFFF;
+            free(size);
+
+            fread(&this->blackPixels, sizeof(int), 1, file);
+
+            size_t result;
+            // stream size for read by parts
+            int sizeStream = 128;
+            int offset = 0;
+            // float byte;
+
+            if (width > 0 && height > 0) {
+                this->costMap = (float*) malloc(this->kWidth * this->kHeight * sizeof(float));
+            } else {
+                // invalid size
+                return;
+            }
+
+            do {
+                // init memory for stream of bits
+                float* stream = (float*) malloc(sizeStream * sizeof(float));
+                memset(stream, 0, sizeStream * sizeof(float));
+
+                result = fread(stream, sizeof(float), sizeStream, file);
+
+                if (result >= sizeStream) {
+                    memcpy(this->costMap + offset, stream, sizeStream * sizeof(float));
+                    offset += result;
+                }
+
+                free(stream);
+            } while(result >= sizeStream);
+
+            fclose(file);
+        }
+
+        void loadBinFile(char* fileName) {
             FILE* file = fopen(fileName, "rb");
 
             // first 4 bytes - size (width x height)
@@ -36,14 +118,12 @@ class BitMapCost
 
             size_t result;
             // stream size for read by parts
-            int sizeStream = 100;
+            int sizeStream = 128;
             int offset = 0;
             UCHAR byte = 0;
 
             if (width > 0 && height > 0) {
-                cout << "Width x Height = " << this->width << " x " << this->height << endl;
                 this->bitMap = (UCHAR*) malloc(this->width * this->height * sizeof(UCHAR));
-                this->costMap = (float*) malloc(this->width * this->height * sizeof(float));
             } else {
                 // invalid size
                 return;
