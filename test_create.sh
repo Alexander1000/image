@@ -1,13 +1,13 @@
-./binfilter derevo.jpg derevo.bin
-./binfilter car.jpg car.bin
-./binfilter profile.jpg profile.bin
-./binfilter iphone.jpg iphone.bin
-./binfilter iphone2.jpg iphone2.bin
-./binfilter duhi.jpg duhi.bin
+./bin/binfilter ./images/derevo.jpg ./images/derevo.bin
+./bin/binfilter ./images/car.jpg ./images/car.bin
+./bin/binfilter ./images/profile.jpg ./images/profile.bin
+./bin/binfilter ./images/iphone.jpg ./images/iphone.bin
+./bin/binfilter ./images/iphone2.jpg ./images/iphone2.bin
+./bin/binfilter ./images/duhi.jpg ./images/duhi.bin
 
-./buildcostmap derevo.bin derevo.k
-./buildcostmap car.bin car.k
-./buildcostmap profile.bin profile.k
-./buildcostmap iphone.bin iphone.k
-./buildcostmap iphone2.bin iphone2.k
-./buildcostmap duhi.bin duhi.k
+./bin/buildcostmap ./images/derevo.bin ./images/derevo.k
+./bin/buildcostmap ./images/car.bin ./images/car.k
+./bin/buildcostmap ./images/profile.bin ./images/profile.k
+./bin/buildcostmap ./images/iphone.bin ./images/iphone.k
+./bin/buildcostmap ./images/iphone2.bin ./images/iphone2.k
+./bin/buildcostmap ./images/duhi.bin ./images/duhi.k
