@@ -14,32 +14,12 @@ int main(int argc, char* argv[])
 {
     Image image(argv[1]);
 
-    // cout << "Height: " << image.height << endl;
-    // cout << "Width: " << image.width << endl;
-
-    /*GrayFilter filter(image.bitMap, image.width, image.height);
-    int* grayMap = filter.filter();
-    
-    if (image.saveJpegBitmap("derevo2.jpg", grayMap, filter.width, filter.height) == 0) {
-        cout << "Gray filter saved ..." << endl;
-    }*/
-
-    /*ZoneFilter smoothFilter(image.bitMap, image.width, image.height);
-
-    if (image.saveJpegBitmap("derevo2.jpg", smoothFilter.filterSmooth(), image.width, image.height) == 0) {
-        cout << "Smooth filter save ... " << endl;
-    }*/
-
+    // filter for make black-white image
     ZoneFilter zonefilter(image.bitMap, image.width, image.height);
     int* bitMap = zonefilter.filter();
 
-    /*if (image.saveJpegBitmap("derevo3.jpg", bitMap, image.width, image.height) == 0) {
-        cout << "Zone filter save ..." << endl;
-    }*/
-
+    // filter convert from black-white image to bin-format 
     BinFilter binFilter(bitMap, image.width, image.height);
-
-    binFilter.filter();
     binFilter.save(argv[2]);
 
     return 0;

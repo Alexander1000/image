@@ -6,7 +6,7 @@ class BinFilter : public Filter
         }
 
         BinFilter(int* bitMap, int width, int height) : Filter(bitMap, width, height) {
-            // do something ...
+            this->filter();
          }
 
         UCHAR* filter() {
