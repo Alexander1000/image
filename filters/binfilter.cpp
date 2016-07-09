@@ -11,8 +11,8 @@ class BinFilter : public Filter
 
         UCHAR* filter() {
             // 1 пиксель = 2 возможных состояний (1 бит)
-            // this->size = (ceil(width * height / 8) + 4);
-            this->size = 4;
+            this->size = (ceil(width * height / 8) + 4);
+            // this->size = 4;
             this->bitMap = (UCHAR*) malloc(this->size * sizeof(UCHAR));
             memset(this->bitMap, 0, this->size);
 
@@ -26,19 +26,31 @@ class BinFilter : public Filter
             this->bitMap[3] = (UCHAR) ((height >> 8) & 0xFF);
 
             Pixel pixel;
-            int count = 0;
-            int blackOffset = 0;
-            vector<int*> fills;
+            // int count = 0;
+            // int blackOffset = 0;
+            // vector<int*> fills;
 
-            bool isBlask = false;
+            // bool isBlask = false;
+            UCHAR byte = 0;
+            int offset = 0;
 
             for (int i = 0; i < this->height; ++i) {
                 for (int j = 0; j < this->width; ++j) {
                     pixel.load(this->originalBitMap[i * this->width + j]);
+                    offset = i * this->width + j;
                     // this->setPixel(i, j, pixel.red > 0 ? 1 : 0);
                     // test = onBlack ? pixel.red == 0 : pixel.red > 0;
 
-                    if (pixel.red < 32 && !isBlask) {
+                    if (pixel.red < 32) {
+                        byte |= (0x01 << (offset % 8));
+                    }
+
+                    if ((offset + 1) % 8 == 0) {
+                        this->bitMap[4 + ((offset + 1) / 8) - 1] = byte;
+                        byte = 0;
+                    }
+
+                    /*if (pixel.red < 32 && !isBlask) {
                         isBlask = true;
                         count = 1;
                         blackOffset = i * this->width + j;
@@ -58,11 +70,11 @@ class BinFilter : public Filter
                         fills.push_back(info);
                         count = 0;
                         continue;
-                    }
+                    }*/
                 }
             }
 
-            int curOffset = 4;
+            /*int curOffset = 4;
 
             for (int i = 0; i < fills.size(); ++i) {
                 int* curInterval = fills[i];
@@ -82,7 +94,7 @@ class BinFilter : public Filter
 
                 curOffset += 8;
                 free(curInterval);
-            }
+            }*/
 
             return this->bitMap;
         }
