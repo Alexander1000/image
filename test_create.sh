@@ -1,9 +1,15 @@
-images=(derevo car profile iphone iphone2 duhi)
+rm -f ./images/*.bin
+rm -f ./images/*.k
 
-for ((i=0; i < ${#images[@]}; i++))
+for i in $(find ./images -name *.jpg);
 do
-    echo "binfilter: " ${images[$i]}.jpg " => " ${images[$i]}.bin
-    ./bin/binfilter ./images/${images[$i]}.jpg ./images/${images[$i]}.bin
-    echo "buildcostmap: " ${images[$i]}.bin " => " ${images[$i]}.k
-    ./bin/buildcostmap ./images/${images[$i]}.bin ./images/${images[$i]}.k
+    filename="${i##*/}"
+    base="${filename%.[^.]*}"
+
+    echo "Found: " $base.jpg "..."
+    echo "binfilter: " $base.jpg " => " $base.bin
+    ./bin/binfilter ./images/$base.jpg ./images/$base.bin
+    echo "buildcostmap: " $base.bin " => " $base.k
+    ./bin/buildcostmap ./images/$base.bin ./images/$base.k
+    echo ""
 done
