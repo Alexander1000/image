@@ -16,7 +16,7 @@ class BinFilter : public Filter
             this->bitMap = (UCHAR*) malloc(this->size * sizeof(UCHAR));
             memset(this->bitMap, 0, this->size);
 
-            cout << "Width x Height = " << this->width * this->height << endl;
+            // cout << "Width x Height = " << this->width * this->height << endl;
             // cout << "Size of bin file: " << this->size << endl;
 
             this->bitMap[0] = (UCHAR) (width & 0xFF);
@@ -38,21 +38,21 @@ class BinFilter : public Filter
                     // this->setPixel(i, j, pixel.red > 0 ? 1 : 0);
                     // test = onBlack ? pixel.red == 0 : pixel.red > 0;
 
-                    if (pixel.red == 0 && !isBlask) {
+                    if (pixel.red < 32 && !isBlask) {
                         isBlask = true;
                         count = 1;
                         blackOffset = i * this->width + j;
                         continue;
                     }
 
-                    if (pixel.red == 0 && isBlask) {
+                    if (pixel.red < 32 && isBlask) {
                         ++count;
                         continue;
                     }
 
-                    if (pixel.red > 0 && isBlask) {
+                    if (pixel.red >= 32 && isBlask) {
                         isBlask = false;
-                        int* info = (int*) malloc(sizeof(int));
+                        int* info = (int*) malloc(2 * sizeof(int));
                         info[0] = blackOffset;
                         info[1] = count;
                         fills.push_back(info);
@@ -66,14 +66,18 @@ class BinFilter : public Filter
 
             for (int i = 0; i < fills.size(); ++i) {
                 int* curInterval = fills[i];
-                UCHAR* newBitMap = (UCHAR*) malloc((this->size + 8) * sizeof(int));
+                UCHAR* newBitMap = (UCHAR*) malloc((this->size + 8) * sizeof(UCHAR));
+                memset(newBitMap, 0, this->size + 8);
                 memcpy(newBitMap, this->bitMap, this->size);
+                free(this->bitMap);
                 this->bitMap = newBitMap;
                 this->size += 8;
 
+                cout << "Offset: " << curInterval[0] << "; Count: " << curInterval[1] << endl;
+
                 for (int j = 0; j < 4; ++j) {
-                    this->bitMap[curOffset + j] = ((curInterval[0] >> j) & 0xFF);
-                    this->bitMap[curOffset + 4 + j] = ((curInterval[1] >> j) & 0xFF);
+                    this->bitMap[curOffset + j] = ((curInterval[0] >> j * 8) & 0xFF);
+                    this->bitMap[curOffset + 4 + j] = ((curInterval[1] >> j * 8) & 0xFF);
                 }
 
                 curOffset += 8;

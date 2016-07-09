@@ -14,8 +14,8 @@ int main(int argc, char* argv[])
 {
     Image image(argv[1]);
 
-    cout << "Height: " << image.height << endl;
-    cout << "Width: " << image.width << endl;
+    // cout << "Height: " << image.height << endl;
+    // cout << "Width: " << image.width << endl;
 
     /*GrayFilter filter(image.bitMap, image.width, image.height);
     int* grayMap = filter.filter();
@@ -24,25 +24,23 @@ int main(int argc, char* argv[])
         cout << "Gray filter saved ..." << endl;
     }*/
 
-    ZoneFilter smoothFilter(image.bitMap, image.width, image.height);
+    /*ZoneFilter smoothFilter(image.bitMap, image.width, image.height);
 
     if (image.saveJpegBitmap("derevo2.jpg", smoothFilter.filterSmooth(), image.width, image.height) == 0) {
         cout << "Smooth filter save ... " << endl;
-    }
+    }*/
 
     ZoneFilter zonefilter(image.bitMap, image.width, image.height);
     int* bitMap = zonefilter.filter();
 
-    if (image.saveJpegBitmap("derevo3.jpg", bitMap, image.width, image.height) == 0) {
+    /*if (image.saveJpegBitmap("derevo3.jpg", bitMap, image.width, image.height) == 0) {
         cout << "Zone filter save ..." << endl;
-    }
+    }*/
 
     BinFilter binFilter(bitMap, image.width, image.height);
-    // FILE file;
+
     binFilter.filter();
-    binFilter.save("derevo.bin");
-    // file = fopen("out.bin", "wb");
-    // fclose(file);
+    binFilter.save(argv[2]);
 
     return 0;
 }
