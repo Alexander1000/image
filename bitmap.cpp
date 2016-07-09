@@ -20,12 +20,16 @@ class BitMap
 
         void loadFile(char* fileName) {
             FILE* file = fopen(fileName, "rb");
+
+            // first 4 bytes - size (width x height)
             int* size = (int*) malloc(sizeof(int));
             fread(size, sizeof(int), 1, file);
             this->width = *size & 0xFFFF;
             this->height = (*size >> 16) & 0xFFFF;
-            // vector<int*> fills;
+            free(size);
+
             size_t result;
+            // stream size for read by parts
             int sizeStream = 100;
             int offset = 0;
             UCHAR byte = 0;
@@ -33,23 +37,24 @@ class BitMap
             if (width > 0 && height > 0) {
                 cout << "Width x Height = " << this->width << " x " << this->height << endl;
                 this->bitMap = (int*) malloc(this->width * this->height * sizeof(int));
+            } else {
+                // invalid size
+                return;
             }
 
+            // maximal offset (width x height)
             int lastOffset = this->width * this->height;
+            // code color (black 0x000000 or white 0xffffff)
             int pixel;
 
             do {
+                // init memory for stream of bits
                 UCHAR* stream = (UCHAR*) malloc(sizeStream * sizeof(UCHAR));
                 memset(stream, 0, sizeStream * sizeof(UCHAR));
 
                 result = fread(stream, sizeof(UCHAR), sizeStream, file);
-                // int* interval = (int*) malloc(2 * sizeof(int));
-                // result = fread(interval, sizeof(int), 2, file);
-                // cout << "[" << fills.size() << "]: {" << interval[0] << " : " << interval[1] << "}" << endl;
-                //cout << "Result: " << resuld << endl;
 
                 if (result >= sizeStream) {
-                    // fills.push_back(interval);
                     for (int i = 0; i < sizeStream; ++i) {
                         byte = stream[i];
 
@@ -68,32 +73,9 @@ class BitMap
                         offset += 8;
                     }
                 }
+
+                free(stream);
             } while(result >= sizeStream);
-
-            
-
-            /*int offset = 0;
-            Pixel pixel;
-
-            cout << fills.size() << " intervals" << endl;
-
-            for (int i = 0; i < fills.size(); ++i) {
-                int* curInterval = fills[i];
-
-                // cout << "[" << i << "]: {" << curInterval[0] << " : " << curInterval[1] << "}" << endl;
-
-                for (int j = offset; j < curInterval[0]; ++j) {
-                    // pixel.load(0xFF);
-                    this->bitMap[j] = 0xFFFFFF;
-                }
-
-                for (int j = 0; j < curInterval[1]; ++j) {
-                    //pixel.load(0x00);
-                    this->bitMap[curInterval[0] + j] = 0x000000;
-                }
-
-                offset = curInterval[0] + curInterval[1];
-            }*/
 
             fclose(file);
         }
