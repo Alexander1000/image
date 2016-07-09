@@ -1,4 +1,11 @@
-images=(car derevo iphone iphone2 duhi profile)
+images=()
+
+for i in $(find ./images -name *.jpg);
+do
+    filename="${i##*/}"
+    base="${filename%.[^.]*}"
+    images+=($base)
+done
 
 for ((i=0; i < ${#images[@]}; i++))
 do
