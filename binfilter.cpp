@@ -3,8 +3,6 @@
 #include <vector>
 #include <math.h>
 #include "image.cpp"
-//#include "pixel.cpp"
-//#include "filters/grayfilter.cpp"
 #include "filters/zonefilter.cpp"
 #include "filters/binfilter.cpp"
 
