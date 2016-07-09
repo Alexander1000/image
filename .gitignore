@@ -3,3 +3,5 @@
 /images
 !images/empty
 .DS_Store
+/images2
+!images/empty
