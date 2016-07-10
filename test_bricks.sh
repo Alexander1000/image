@@ -3,11 +3,22 @@ do
     filename="${i##*/}"
     base="${filename%.[^.]*}"
 
-    if [[ $1 == "" || $1 == $base ]];
+    if [[ "$#" == 4 ]];
+    then
+        if [[ $1 == "" || $1 == $base ]];
+        then
+            echo "Found: " $base.jpg "..."
+            echo "bricks:" $base.jpg "=>" bricks_$base.jpg
+            ./bin/bricks ./images/$base.jpg ./images2/bricks_$base.jpg $2 $3 $4
+            echo ""
+        fi
+    fi
+
+    if [[ "$#" == 3 ]];
     then
         echo "Found: " $base.jpg "..."
         echo "bricks:" $base.jpg "=>" bricks_$base.jpg
-        ./bin/bricks ./images/$base.jpg ./images2/bricks_$base.jpg 5 5 1
+        ./bin/bricks ./images/$base.jpg ./images2/bricks_$base.jpg $1 $2 $3
         echo ""
     fi
 done
