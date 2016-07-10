@@ -18,8 +18,8 @@ class BricksFilter : public Filter
             Pixel newPixel;
             int red = 0, green = 0, blue = 0, count = 0;
 
-            int bWidth = (int) ceil(this->width / width);
-            int bHeight = (int) ceil(this->height / height);
+            int bWidth = (int) ceil((float) this->width / width);
+            int bHeight = (int) ceil((float) this->height / height);
 
             for (int i = 0; i < bHeight; ++i) {
                 for (int j = 0; j < bWidth; ++j) {
@@ -117,8 +117,8 @@ class BricksFilter : public Filter
                         }
                     } else {
                         // use colors
-                        int lHeight = (i + 1) * height > this->height ? (i + 1) * height - this->height : height;
-                        int lWidth = (j + 1) * width > this->width ? (j + 1) * width - this->width : width;
+                        int lHeight = (i + 1) * height > this->height ? this->height - i * height : height;
+                        int lWidth = (j + 1) * width > this->width ? this->width - j * width : width;
                         Pixel nnPixel;
 
                         for (int ii = 0; ii < lHeight; ++ii) {
