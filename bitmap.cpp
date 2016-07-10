@@ -35,7 +35,6 @@ class BitMap
             UCHAR byte = 0;
 
             if (width > 0 && height > 0) {
-                cout << "Width x Height = " << this->width << " x " << this->height << endl;
                 this->bitMap = (int*) malloc(this->width * this->height * sizeof(int));
             } else {
                 // invalid size
