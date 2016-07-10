@@ -9,13 +9,16 @@ done
 
 for ((i=0; i < ${#images[@]}; i++))
 do
-    echo ${images[$i]}
+    if [[ $1 == "" || $1 == ${images[$i]} ]];
+    then
+        echo ${images[$i]}
 
-    for ((j=0; j < ${#images[@]}; j++))
-    do
-        echo ${images[$i]} "=" ${images[$j]}
-        ./bin/gauge ./images/${images[$i]}.bin ./images/${images[$j]}.k
-    done
+        for ((j=0; j < ${#images[@]}; j++))
+        do
+            echo ${images[$i]} "=" ${images[$j]}
+            ./bin/gauge ./images/${images[$i]}.bin ./images/${images[$j]}.k
+        done
 
-    echo ""
+        echo ""
+    fi
 done
