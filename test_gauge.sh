@@ -2,7 +2,7 @@ images=()
 
 for i in $(find ./images -name *.jpg);
 do
-    filename="${i##*/}"
+    filename="${i##*/images/}"
     base="${filename%.[^.]*}"
     images+=($base)
 done

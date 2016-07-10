@@ -3,7 +3,7 @@ rm -f ./images/*.k
 
 for i in $(find ./images -name *.jpg);
 do
-    filename="${i##*/}"
+    filename="${i##*/images/}"
     base="${filename%.[^.]*}"
 
     if [[ $1 == "" || $1 == $base ]];

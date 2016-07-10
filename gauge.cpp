@@ -8,6 +8,6 @@ int main(int argc, char* argv[])
 {
     BitMapCost mapCost(argv[1]);
     mapCost.loadKFile(argv[2]);
-    cout << "Gauge: " << mapCost.calc() << endl;
+    cout << mapCost.calc() << endl;
     return 0;
 }
