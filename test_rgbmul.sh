@@ -13,4 +13,12 @@ do
             echo ""
         fi
     fi
+
+    if [[ "$#" == 3 ]];
+    then
+        echo "Found: " $base.jpg "..."
+        echo "rgbmul:" $base.jpg "=>" rgbmul_$base.jpg
+        ./bin/rgbmul ./images/$base.jpg ./images2/rgbmul_$base.jpg $1 $2 $3
+        echo ""
+    fi
 done
