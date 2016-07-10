@@ -1,4 +1,12 @@
-files=(binfilter bin2jpg buildcostmap gauge pixelator)
+files=()
+
+for i in $(find ./build -name build_*.sh);
+do
+    filename="${i##*/}"
+    base="${filename%.[^.]*}"
+    build="${base##build_}"
+    files+=($build)
+done
 
 for ((i=0; i < ${#files[@]}; i++))
 do
