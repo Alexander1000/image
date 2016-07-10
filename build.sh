@@ -1,6 +1,6 @@
 files=()
 
-for i in $(find ./build -name build_*.sh);
+for i in $(find ./build/build_*.sh);
 do
     filename="${i##*/}"
     base="${filename%.[^.]*}"
