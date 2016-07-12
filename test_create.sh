@@ -5,9 +5,8 @@ for i in $(find ./images -name *.jpg);
 do
     filename="${i##*/images/}"
     base="${filename%.[^.]*}"
-
-    if [[ $1 == "" || $1 == $base ]];
-    then
+    
+    if [[ $1 == "-r" || ! -f ./images/$base.k ]]; then
         echo "Found: " $base.jpg "..."
         echo "binfilter:" $base.jpg "=>" $base.bin
         ./bin/binfilter ./images/$base.jpg ./images/$base.bin
