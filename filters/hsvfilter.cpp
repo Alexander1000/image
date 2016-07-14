@@ -96,6 +96,7 @@ class HsvMulFilter : public Filter
                     pixel.load(bitMap[i * width + j]);
                     int* minMax = this->calcMaxMinRGB(&pixel);
                     int min = minMax[0], max = minMax[1];
+                    free(minMax);
 
                     // выделяем память под компоненты HSV
                     int* hsvPixel = (int*) malloc(3 * sizeof(int));
