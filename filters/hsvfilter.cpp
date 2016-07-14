@@ -1,3 +1,5 @@
+using namespace std;
+
 class HsvMulFilter : public Filter
 {
     public:
@@ -10,12 +12,6 @@ class HsvMulFilter : public Filter
          }
 
         int* filter(float h, float s, float v) {
-            // this->bitMap = (int*) malloc(this->width * this->height * sizeof(int));
-            // unsigned char a, r, g, b;
-            // Pixel pixel;
-            // Pixel newPixel;
-            // int sum = 0;
-
             this->hsvMap = this->toHSV(this->originalBitMap, this->width, this->height);
 
             this->bitMap = this->toRGB(this->hsvMap, this->width, this->height);
@@ -24,8 +20,6 @@ class HsvMulFilter : public Filter
         }
 
     private:
-        // UCHAR minColor;
-        // UCHAR maxColor;
         int* bitMap;
         int** hsvMap;
 
@@ -92,22 +86,28 @@ class HsvMulFilter : public Filter
         }
 
         int** toHSV(int* bitMap, int width, int height) {
-            int* minMax = this->calcMaxMinRGB(bitMap, width, height);
             int** hsvMap = (int**) malloc(height * width * sizeof(int*));
-
-            int min = minMax[0];
-            int max = minMax[1];
-            free(minMax);
 
             Pixel pixel;
 
             for (int i = 0; i < height; ++i) {
                 for (int j = 0; j < width; ++j) {
+                    // получаем компоненты RGB
                     pixel.load(bitMap[i * width + j]);
+                    int* minMax = this->calcMaxMinRGB(&pixel);
+                    int min = minMax[0], max = minMax[1];
+
+                    // выделяем память под компоненты HSV
                     int* hsvPixel = (int*) malloc(3 * sizeof(int));
+                    // Hue (оттенок)
                     hsvPixel[0] = this->calcHue(min, max, &pixel);
+                    // Saturation (насыщенность)
                     hsvPixel[1] = (int) ceil(this->calcSaturation(min, max) * 100);
+                    // Value (Значение)
                     hsvPixel[2] = max;
+
+                    // cout << "[" << i << ";" << j << "]: HSV (" << hsvPixel[0] << "; " << hsvPixel[1] << "; " << hsvPixel[2] << ")" << endl;
+
                     hsvMap[i * width + j] = hsvPixel;
                 }
             }
@@ -128,63 +128,53 @@ class HsvMulFilter : public Filter
                 return 0;
             }
 
-            if (max == pixel->red && pixel->green >= pixel->blue) {
-                return (int) ceil(60 * (pixel->green - pixel->blue) / (max - min));
+            if (pixel->red == max && pixel->green >= pixel->blue) {
+                return (int) ceil((float) 60 * (pixel->green - pixel->blue) / (max - min));
             }
 
-            if (max == pixel->red && pixel->green < pixel->blue) {
-                return (int) ceil(60 * (pixel->green - pixel->blue) / (max - min) + 360);
+            if (pixel->red == max && pixel->green < pixel->blue) {
+                return (int) ceil((float) 60 * (pixel->green - pixel->blue) / (max - min) + 360);
             }
 
-            if (max == pixel->green) {
-                return (int) ceil(60 * (pixel->blue - pixel->red) / (max - min) + 120);
+            if (pixel->green == max) {
+                return (int) ceil((float) 60 * (pixel->blue - pixel->red) / (max - min) + 120);
             }
 
-            if (max == pixel->blue) {
-                return (int) ceil(60 * (pixel->red - pixel->green) / (max - min) + 240);
+            if (pixel->blue == max) {
+                return (int) ceil((float) 60 * (pixel->red - pixel->green) / (max - min) + 240);
             }
 
             return 0;
         }
 
-        int* calcMaxMinRGB(int* bitMap, int width, int height) {
+        int* calcMaxMinRGB(Pixel* pixel) {
             int* result = (int*) malloc(2 * sizeof(int));
-            result[0] = 255;
-            result[1] = 0;
 
             int minColor = 255;
             int maxColor = 0;
 
-            Pixel pixel;
+            if (minColor > pixel->red) {
+                minColor = pixel->red;
+            }
 
-            for (int i = 0; i < height; ++i) {
-                for (int j = 0; j < width; ++j) {
-                    pixel.load(bitMap[i * width + j]);
+            if (minColor > pixel->green) {
+                minColor = pixel->green;
+            }
 
-                    if (minColor > pixel.red) {
-                        minColor = pixel.red;
-                    }
+            if (minColor > pixel->blue) {
+                minColor = pixel->blue;
+            }
 
-                    if (minColor > pixel.green) {
-                        minColor = pixel.green;
-                    }
+            if (maxColor < pixel->red) {
+                maxColor = pixel->red;
+            }
 
-                    if (minColor > pixel.blue) {
-                        minColor = pixel.blue;
-                    }
+            if (maxColor < pixel->green) {
+                maxColor = pixel->green;
+            }
 
-                    if (maxColor < pixel.red) {
-                        maxColor = pixel.red;
-                    }
-
-                    if (maxColor < pixel.green) {
-                        maxColor = pixel.green;
-                    }
-
-                    if (maxColor < pixel.blue) {
-                        maxColor = pixel.blue;
-                    }
-                }
+            if (maxColor < pixel->blue) {
+                maxColor = pixel->blue;
             }
 
             result[0] = minColor;
