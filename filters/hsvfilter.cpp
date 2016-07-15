@@ -30,12 +30,12 @@ class HsvMulFilter : public Filter
                 for (int j = 0; j < width; ++j) {
                     // Pixel pixel;
                     int* hsvPixel = hsvMap[i * width + j];
-                    UCHAR v = (UCHAR) ceil(((float) hsvPixel[2] / 255) * 100);
+                    UCHAR v = (UCHAR) hsvPixel[2];
                     int hue = (int) ceil(hsvPixel[0] / 60) % 6;
-                    UCHAR vMin = (UCHAR) ceil((100 - hsvPixel[1]) * v); 
+                    UCHAR vMin = (UCHAR) ceil((100 - hsvPixel[1]) * (float) v / 100);
                     float a = (v - vMin) * (float) (hsvPixel[0] % 60) / 60;
                     UCHAR vInc = (UCHAR) ceil(vMin + a);
-                    UCHAR vDec = (UCHAR) ceil((v - a));
+                    UCHAR vDec = (UCHAR) ceil(v - a);
                     bitMap[i * width + j] = this->hsvPixelToRGB(hue, v, vMin, vInc, vDec);
                 }
             }
