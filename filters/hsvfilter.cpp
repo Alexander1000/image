@@ -14,6 +14,33 @@ class HsvMulFilter : public Filter
         int* filter(float h, float s, float v) {
             this->hsvMap = this->toHSV(this->originalBitMap, this->width, this->height);
 
+            for (int i = 0; i < this->height; ++i) {
+                for (int j = 0; j < this->width; ++j) {
+                    int* hsvPixel = this->hsvMap[i * this->width + j];
+                    int hue = (int) ceil(h * hsvPixel[0]);
+                    int saturation = (int) ceil(s * hsvPixel[1]);
+                    int value = (int) ceil(v * hsvPixel[2]);
+
+                    if (hue > 360) {
+                        hue = 360;
+                    }
+
+                    if (saturation > 100) {
+                        saturation = 100;
+                    }
+
+                    if (value > 255) {
+                        value = 255;
+                    }
+
+                    hsvPixel[0] = hue;
+                    hsvPixel[1] = saturation;
+                    hsvPixel[2] = value;
+
+                    this->hsvMap[i * this->width + j] = hsvPixel;
+                }
+            }
+
             this->bitMap = this->toRGB(this->hsvMap, this->width, this->height);
 
             return this->bitMap;
