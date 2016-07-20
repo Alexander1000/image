@@ -64,7 +64,7 @@ class BitMapCost
 
         void buildCost() {
             this->costMap = (float*) malloc(this->width * this->height * sizeof(float));
-            this->prepareBuildCost(40);
+            this->prepareBuildCost(10);
             this->buildCostMap();
         }
 
@@ -180,9 +180,17 @@ class BitMapCost
         }
 
         void prepareBuildCost(int widthGradient) {
-            this->widthGradient = widthGradient;
+            int minGradient = 0;
+            this->heightGradient = (int) ceil((float) this->height / widthGradient);
+            this->widthGradient = (int) ceil((float) this->width / widthGradient);
 
-            for (int k = 0; k < this->widthGradient; ++k) {
+            if (this->heightGradient < this->widthGradient) {
+                minGradient = this->heightGradient;
+            } else {
+                minGradient = this->widthGradient;
+            }
+
+            for (int k = 0; k < minGradient; ++k) {
                 for (int i = 0; i < this->height; ++i) {
                     for (int j = 0; j < this->width; ++j) {
                         if (this->bitMap[i * this->width + j] != k + 1) {
@@ -283,6 +291,7 @@ class BitMapCost
         UCHAR* bitMap;
         float* costMap;
         int widthGradient;
+        int heightGradient;
         int blackPixels;
         int kBlackPixels;
         float maxK;
@@ -292,8 +301,16 @@ class BitMapCost
                 return 0.0f;
             }
 
+            int minGradient = 0;
+
+            if (this->heightGradient < this->widthGradient) {
+                minGradient = this->heightGradient;
+            } else {
+                minGradient = this->widthGradient;
+            }
+
             float diffE = exp(1) - 1.0;
-            float indexK = (float) (this->widthGradient - index + 1) / this->widthGradient;
+            float indexK = (float) (minGradient - index + 1) / minGradient;
             float k = exp(diffE * indexK) * sin(indexK * diffE);
 
             if (index == 1) {
