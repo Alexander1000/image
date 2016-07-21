@@ -62,6 +62,18 @@ class BitMapCost
             return (sum / this->blackPixels) * rateForm * ratePixels;
         }
 
+        void costToBitMap() {
+            this->bitMapCost = (int*) malloc(this->kHeight * this->kWidth * sizeof(int));
+            Pixel pixel;
+
+            for (int i = 0; i < this->kHeight; ++i) {
+                for (int j = 0; j < this->kWidth; ++j) {
+                    pixel.load((UCHAR) ceil((float) 0xFF * this->costMap[i * this->kWidth + j]));
+                    this->bitMap[i * this->kWidth + j] = pixel.toInt32(); 
+                }
+            }
+        }
+
         void buildCost() {
             this->costMap = (float*) malloc(this->width * this->height * sizeof(float));
             this->prepareBuildCost(10);
@@ -179,6 +191,10 @@ class BitMapCost
             return this->bitMap;
         }
 
+        int* getBitMapCost() {
+            return this->bitMapCost;
+        }
+
         void prepareBuildCost(int widthGradient) {
             int minGradient = 0;
             this->heightGradient = (int) ceil((float) this->height / widthGradient);
@@ -289,6 +305,7 @@ class BitMapCost
 
     private:
         UCHAR* bitMap;
+        int* bitMapCost;
         float* costMap;
         int widthGradient;
         int heightGradient;

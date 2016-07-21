@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include "pixel.cpp"
 #include "bitmapcost.cpp"
 
 using namespace std;
