@@ -68,14 +68,15 @@ class BitMapCost
 
             for (int i = 0; i < this->kHeight; ++i) {
                 for (int j = 0; j < this->kWidth; ++j) {
-                    pixel.load((UCHAR) ceil((float) 0xFF * this->costMap[i * this->kWidth + j]));
-                    this->bitMap[i * this->kWidth + j] = pixel.toInt32(); 
+                    pixel.load((UCHAR) ceil((float) 0xFF * (1 - this->costMap[i * this->kWidth + j])));
+                    this->bitMapCost[i * this->kWidth + j] = pixel.toInt32(); 
                 }
             }
         }
 
         void buildCost() {
             this->costMap = (float*) malloc(this->width * this->height * sizeof(float));
+            memset(this->costMap, 0, this->width * this->height * sizeof(float));
             this->prepareBuildCost(10);
             this->buildCostMap();
         }
@@ -166,10 +167,10 @@ class BitMapCost
 
                         for (int j = 0; j < 8; ++j) {
                             if ((byte & (0x01 << j)) == 0) {
+                                pixel = 0;
+                            } else {
                                 pixel = 1;
                                 ++this->blackPixels;
-                            } else {
-                                pixel = 0;
                             }
 
                             if (lastOffset > offset + j) {
@@ -250,6 +251,7 @@ class BitMapCost
         }
 
         void buildCostMap() {
+            //int minGradient = 0;
             // прогреваем
             this->calcKoefficient(1);
 
@@ -259,8 +261,13 @@ class BitMapCost
                 }
             }
 
-            /*
-            for (int i = 0; i < this->widthGradient; ++i) {
+            /*if (this->heightGradient < this->widthGradient) {
+                minGradient = this->heightGradient;
+            } else {
+                minGradient = this->widthGradient;
+            }*/
+            
+            /*for (int i = 0; i < minGradient; ++i) {
                 float cost = this->calcKoefficient(i);
 
                 cout << "Cost[" << i << "] = " << cost << endl;
@@ -295,7 +302,12 @@ class BitMapCost
             int size = this->width * this->height;
             
             while (offset < size) {
-                writeBlock = size - offset > step ? step : size - offset;
+                if (size - offset > step) {
+                    writeBlock = step;
+                } else {
+                    writeBlock = size - offset;
+                }
+
                 fwrite(&this->costMap[offset], writeBlock, sizeof(float), file);
                 offset += writeBlock;
             }
@@ -314,7 +326,7 @@ class BitMapCost
         float maxK;
 
         float calcKoefficient(UCHAR index) {
-            if (index == 0) {
+            if (index <= 0) {
                 return 0.0f;
             }
 
@@ -324,6 +336,10 @@ class BitMapCost
                 minGradient = this->heightGradient;
             } else {
                 minGradient = this->widthGradient;
+            }
+
+            if (index > minGradient) {
+                return 0.0f;
             }
 
             float diffE = exp(1) - 1.0;
