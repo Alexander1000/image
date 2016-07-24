@@ -344,7 +344,7 @@ class BitMapCost
 
             float diffE = exp(1) - 1.0;
             float indexK = (float) (minGradient - index + 1) / minGradient;
-            float k = exp(diffE * indexK) * sin(indexK * diffE) * indexK;
+            float k = exp(diffE * indexK) * sin(indexK * diffE) * indexK * indexK;
 
             if (index == 1) {
                 this->maxK = k;

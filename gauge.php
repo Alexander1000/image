@@ -22,6 +22,7 @@ foreach ($argv as $index => $fileName) {
         if ($i % 2 == 0 && !empty($value)) {
             $value = explode('/', $value);
             $list[$i >> 1]['file'] = $value[0];
+            $list[$i >> 1]['path'] = implode('/', $value);
         } elseif ($i % 2 == 1) {
             $list[$i >> 1]['cost'] = floatval($value);
         }
@@ -41,6 +42,7 @@ foreach ($argv as $index => $fileName) {
 }
 
 $list = [];
+$maxCostArr = [];
 
 foreach ($listCost as $listTops) {
     foreach ($listTops as $row) {
@@ -48,12 +50,24 @@ foreach ($listCost as $listTops) {
             $list[$row['file']] = 0;
         }
 
-        $list[$row['file']] += ($row['cost'] * $row['cost']);
+        if (!isset($maxCostArr[$row['file']])) {
+            $maxCostArr[$row['file']] = $row['cost'];
+        }
+
+        $list[$row['file']] += pow($row['cost'], N_COUNT);
+
+        if ($maxCostArr[$row['file']] < $row['cost']) {
+            $maxCostArr[$row['file']] = $row['cost'];
+        }
     }
 }
 
 $maxCost = $countFiles * N_COUNT;
 $listPercents = [];
+
+foreach ($list as $file => $cost) {
+    $list[$file] = $cost * pow($maxCostArr[$file], N_COUNT);
+}
 
 $result = [];
 
