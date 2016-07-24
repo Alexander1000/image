@@ -265,9 +265,9 @@ class BitMapCost
                 minGradient = this->heightGradient;
             } else {
                 minGradient = this->widthGradient;
-            }*/
+            }
             
-            /*for (int i = 0; i < minGradient; ++i) {
+            for (int i = 0; i < minGradient; ++i) {
                 float cost = this->calcKoefficient(i);
 
                 cout << "Cost[" << i << "] = " << cost << endl;
@@ -344,7 +344,7 @@ class BitMapCost
 
             float diffE = exp(1) - 1.0;
             float indexK = (float) (minGradient - index + 1) / minGradient;
-            float k = exp(diffE * indexK) * sin(indexK * diffE);
+            float k = exp(diffE * indexK) * sin(indexK * diffE) * indexK;
 
             if (index == 1) {
                 this->maxK = k;

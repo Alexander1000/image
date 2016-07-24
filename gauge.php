@@ -48,7 +48,7 @@ foreach ($listCost as $listTops) {
             $list[$row['file']] = 0;
         }
 
-        $list[$row['file']] += $row['cost'];
+        $list[$row['file']] += ($row['cost'] * $row['cost']);
     }
 }
 
